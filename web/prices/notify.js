@@ -34,16 +34,40 @@ function getEnv() {
   return loadEnvFile();
 }
 
-export async function notifyPriceAlert({ trip, snapshot, threshold }) {
+function buildDeepLink(trip) {
+  if (!trip) return null;
+  if (trip.kind === 'flight' && trip.origin && trip.destination && trip.departDate) {
+    const o = trip.origin.toUpperCase();
+    const d = trip.destination.toUpperCase();
+    const cabin = ({ economy:'economy', premium_economy:'premium', business:'business', first:'first' })[trip.cabinClass] || 'economy';
+    return `https://www.google.com/travel/flights?q=${o}%20to%20${d}%20${trip.departDate}${trip.returnDate ? '%20' + trip.returnDate : ''}%20${cabin}%20${trip.adults || 1}%20adults`;
+  }
+  if (trip.kind === 'hotel' && trip.hotelCity) {
+    const city = encodeURIComponent(trip.hotelCity);
+    const ci = trip.hotelCheckIn || '';
+    const co = trip.hotelCheckOut || '';
+    return `https://www.booking.com/searchresults.html?ss=${city}&checkin=${ci}&checkout=${co}&group_adults=${trip.adults || 1}&no_rooms=1`;
+  }
+  return null;
+}
+
+export async function notifyPriceAlert({ trip, snapshot, threshold, decision }) {
   if (!snapshot || !Number.isFinite(snapshot.bestPrice)) return;
   const env = getEnv();
   const currency = snapshot.currency || trip.currency || 'TWD';
   const fmt = (n) => new Intl.NumberFormat('zh-Hant').format(Math.round(n));
   const lines = [];
-  lines.push(`💰 價格警報：${trip.name}`);
+  const reason = decision?.kind === 'below-average' ? '📉 低於平均價格' :
+                 decision?.kind === 'below-threshold' ? '🎯 低於門檻' : '💰 價格警報';
+  lines.push(`${reason}：${trip.name}`);
   lines.push(`類型：${trip.kind === 'flight' ? '機票' : '住宿'}`);
   lines.push(`目前最低：${currency} ${fmt(snapshot.bestPrice)}`);
-  if (threshold) lines.push(`你的門檻：${currency} ${fmt(threshold)}`);
+  if (decision?.kind === 'below-average' && Number.isFinite(decision.avgPrice)) {
+    lines.push(`歷史平均：${currency} ${fmt(decision.avgPrice)}`);
+    lines.push(`差距：${decision.pct >= 0 ? '+' : ''}${decision.pct.toFixed(1)}% （便宜 ${fmt(-decision.diff)}）`);
+  } else if (decision?.kind === 'below-threshold' && Number.isFinite(decision.threshold)) {
+    lines.push(`你的門檻：${currency} ${fmt(decision.threshold)}`);
+  }
   lines.push(`供應商：${snapshot.provider}`);
   lines.push(`抓取時間：${snapshot.capturedAt}`);
   if (Array.isArray(snapshot.flights) && snapshot.flights.length) {
@@ -54,6 +78,8 @@ export async function notifyPriceAlert({ trip, snapshot, threshold }) {
     const h = snapshot.hotels[0];
     lines.push(`住宿：${h.name}（${fmt(h.pricePerNight)} / 晚，共 ${fmt(h.totalPrice)}）`);
   }
+  const link = buildDeepLink(trip);
+  if (link) lines.push(`🔗 立即比價：${link}`);
   const message = lines.join('\n');
 
   const sends = [];

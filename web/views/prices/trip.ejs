@@ -7,6 +7,31 @@
   const threshold = trip.threshold;
   const alerted = last && Number.isFinite(last.bestPrice) && Number.isFinite(threshold) && last.bestPrice <= threshold;
   const days = summary.daysToDepart;
+  // 一鍵比價 deep link（給頁面用）
+  function dlFlight() {
+    if (trip.kind !== 'flight' || !trip.origin || !trip.destination || !trip.departDate) return null;
+    const o = trip.origin.toUpperCase();
+    const d = trip.destination.toUpperCase();
+    const d1 = trip.departDate.replace(/-/g, '');
+    const ret = trip.returnDate ? trip.returnDate.replace(/-/g, '') : d1;
+    const cabin = ({ economy:'economy', premium_economy:'premium', business:'business', first:'first' })[trip.cabinClass] || 'economy';
+    return {
+      gf: `https://www.google.com/travel/flights?q=${o}%20to%20${d}%20${trip.departDate}${trip.returnDate ? '%20' + trip.returnDate : ''}%20${cabin}%20${trip.adults || 1}%20adults`,
+      sk: `https://www.skyscanner.com/transport/flights/${o.toLowerCase()}/${d.toLowerCase()}/${d1}/?adults=${trip.adults || 1}&cabinclass=${cabin}&return=${ret}`
+    };
+  }
+  function dlHotel() {
+    if (trip.kind !== 'hotel' || !trip.hotelCity) return null;
+    const city = encodeURIComponent(trip.hotelCity);
+    const ci = trip.hotelCheckIn || '';
+    const co = trip.hotelCheckOut || '';
+    return {
+      bk: `https://www.booking.com/searchresults.html?ss=${city}&checkin=${ci}&checkout=${co}&group_adults=${trip.adults || 1}&no_rooms=1`,
+      gh: `https://www.google.com/travel/hotels?q=${city}%20${ci}%20${co}%20${trip.adults || 1}%20adults`
+    };
+  }
+  const flightLinks = dlFlight();
+  const hotelLinks = dlHotel();
   const priceSeries = history.map(function(h) { return { t: h.capturedAt, p: h.bestPrice, currency: h.currency, provider: h.provider }; }).filter(function(x) { return Number.isFinite(x.p) && x.p > 0; });
   const maxPrice = priceSeries.reduce((m, x) => Math.max(m, x.p), 0);
   const minPrice = priceSeries.reduce((m, x) => Math.min(m, x.p), Infinity);
@@ -17,6 +42,14 @@
     const y0 = H - PAD - ((x.p - minPrice) / range) * (H - PAD * 2);
     return { x: x0, y: y0, meta: x };
   });
+  // 平均線計算
+  const validPrices = priceSeries.map(function(x) { return x.p; });
+  const avgPrice = validPrices.length ? Math.round(validPrices.reduce(function(a, b) { return a + b; }, 0) / validPrices.length) : null;
+  const avgY = (Number.isFinite(avgPrice) && range > 0) ? (H - PAD - ((avgPrice - minPrice) / range) * (H - PAD * 2)) : null;
+  const lastPrice = last && Number.isFinite(last.bestPrice) ? last.bestPrice : null;
+  const ratio = (avgPrice && lastPrice) ? lastPrice / avgPrice : null;
+  const ratioPct = ratio ? ((ratio - 1) * 100) : null;
+  const belowAvg = ratio !== null && ratio < 0.95;
 %>
 
 <section class="hero">
@@ -47,6 +80,16 @@
     <% } %>
     <% if (threshold) { %>
       　🎯 門檻 <%= trip.currency %> <%= Math.round(threshold).toLocaleString('zh-Hant') %>
+    <% } %>
+  </p>
+  <p>
+    <% if (flightLinks) { %>
+      <a class="btn primary" href="<%= flightLinks.gf %>" target="_blank" rel="noopener">🔍 Google Flights</a>
+      &nbsp;<a class="btn" href="<%= flightLinks.sk %>" target="_blank" rel="noopener">🔍 Skyscanner</a>
+    <% } %>
+    <% if (hotelLinks) { %>
+      <a class="btn primary" href="<%= hotelLinks.bk %>" target="_blank" rel="noopener">🔍 Booking.com</a>
+      &nbsp;<a class="btn" href="<%= hotelLinks.gh %>" target="_blank" rel="noopener">🔍 Google Hotels</a>
     <% } %>
   </p>
 </section>
@@ -91,6 +134,10 @@
           <polygon fill="url(#areaFill)" points="<%= points.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ') %> <%= W - PAD %>,<%= H - PAD %> <%= PAD %>,<%= H - PAD %>"/>
           <polyline fill="none" stroke="var(--accent)" stroke-width="2" points="<%= points.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ') %>"/>
         <% } %>
+        <% if (avgY !== null && priceSeries.length >= 2) { %>
+          <line x1="<%= PAD %>" y1="<%= avgY.toFixed(1) %>" x2="<%= W - PAD %>" y2="<%= avgY.toFixed(1) %>" stroke="#6f86ff" stroke-dasharray="6 4" stroke-width="1.5"/>
+          <text x="<%= PAD + 6 %>" y="<%= (avgY - 4).toFixed(1) %>" text-anchor="start" font-size="10" fill="#6f86ff">平均 <%= avgPrice.toLocaleString('zh-Hant') %></text>
+        <% } %>
         <% points.forEach(function(p) { %>
           <circle cx="<%= p.x.toFixed(1) %>" cy="<%= p.y.toFixed(1) %>" r="3.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"/>
         <% }) %>
@@ -104,8 +151,18 @@
 
   <div class="price-stats">
     <div class="stat-card">
-      <div class="stat-num"><%= last && Number.isFinite(last.bestPrice) ? Math.round(last.bestPrice).toLocaleString('zh-Hant') : '—' %></div>
+      <div class="stat-num" style="<%= belowAvg ? 'color:#ffb86f' : '' %>"><%= last && Number.isFinite(last.bestPrice) ? Math.round(last.bestPrice).toLocaleString('zh-Hant') : '—' %></div>
       <div class="stat-label">目前最低（<%= (last && last.currency) || trip.currency || 'TWD' %>）</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#6f86ff"><%= avgPrice != null ? avgPrice.toLocaleString('zh-Hant') : '—' %></div>
+      <div class="stat-label">歷史平均價（<%= (last && last.currency) || trip.currency || 'TWD' %>）</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="<%= belowAvg ? 'color:#ffb86f' : 'color:#9aa1b1' %>">
+        <%= ratioPct != null ? (ratioPct >= 0 ? '+' : '') + ratioPct.toFixed(1) + '%' : '—' %>
+      </div>
+      <div class="stat-label">相對平均（<%= belowAvg ? '低於平均 → 已通知' : '高於或等於平均' %>）</div>
     </div>
     <div class="stat-card">
       <div class="stat-num"><%= cheapest && Number.isFinite(cheapest.bestPrice) ? Math.round(cheapest.bestPrice).toLocaleString('zh-Hant') : '—' %></div>
@@ -116,8 +173,8 @@
       <div class="stat-label">抓取筆數</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num"><%= alerted ? '🚨 是' : '—' %></div>
-      <div class="stat-label">觸發門檻</div>
+      <div class="stat-num"><%= alerted ? '🚨 是' : (belowAvg ? '🚨 是' : '—') %></div>
+      <div class="stat-label">警報觸發</div>
     </div>
   </div>
 </section>

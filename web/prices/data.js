@@ -136,6 +136,9 @@ function normalizeTrip(input) {
     ? [...new Set(trip.providers.map(String))]
     : ['mock'];
   trip.notes = String(trip.notes || '').slice(0, 600);
+  trip.alertMode = ['below-average', 'threshold', 'both', 'off'].includes(trip.alertMode)
+    ? trip.alertMode
+    : 'below-average';
   if (trip.kind === 'flight') {
     trip.origin = String(trip.origin || '').toUpperCase().slice(0, 8);
     trip.destination = String(trip.destination || '').toUpperCase().slice(0, 8);
@@ -220,6 +223,50 @@ export function pickCheapest(history) {
   const valid = history.filter((h) => Number.isFinite(h.bestPrice) && h.bestPrice > 0);
   if (!valid.length) return null;
   return valid.reduce((min, p) => (p.bestPrice < min.bestPrice ? p : min), valid[0]);
+}
+
+// 平均 / 標準差（去除 null）；樣本數 >= 3 才有參考性
+export function priceStats(history) {
+  const prices = (history || [])
+    .map((h) => h.bestPrice)
+    .filter((p) => Number.isFinite(p) && p > 0);
+  if (!prices.length) return { count: 0, avg: null, stddev: null, min: null, max: null, sampleSize: 0 };
+  const sum = prices.reduce((a, b) => a + b, 0);
+  const avg = sum / prices.length;
+  const variance = prices.reduce((s, p) => s + (p - avg) ** 2, 0) / prices.length;
+  return {
+    count: prices.length,
+    avg,
+    stddev: Math.sqrt(variance),
+    min: Math.min(...prices),
+    max: Math.max(...prices),
+    sampleSize: prices.length,
+  };
+}
+
+// 判斷目前價相對歷史是否「值得通知」
+// - requireSamples: 至少要幾筆歷史才參考平均（避免冷啟動誤報）
+// - ratioThreshold: 現在 / 平均 < 這個值就觸發（例如 0.95 = 比平均低 5%）
+// 回傳 { shouldAlert, kind, ratio, avgPrice, reason } | null
+export function evaluateBelowAverage(snapshot, history, { requireSamples = 3, ratioThreshold = 0.95 } = {}) {
+  if (!snapshot || !Number.isFinite(snapshot.bestPrice) || snapshot.bestPrice <= 0) return null;
+  const { avg, sampleSize } = priceStats(history);
+  if (!Number.isFinite(avg) || sampleSize < requireSamples) return null;
+  const ratio = snapshot.bestPrice / avg;
+  if (ratio < ratioThreshold) {
+    const diff = snapshot.bestPrice - avg;
+    const pct = (ratio - 1) * 100; // 負數
+    return {
+      shouldAlert: true,
+      kind: 'below-average',
+      avgPrice: avg,
+      ratio,
+      diff,
+      pct,
+      reason: `比平均低 ${Math.abs(pct).toFixed(1)}%（平均 ${Math.round(avg).toLocaleString('zh-Hant')}，目前 ${Math.round(snapshot.bestPrice).toLocaleString('zh-Hant')}）`,
+    };
+  }
+  return { shouldAlert: false, kind: 'below-average', avgPrice: avg, ratio, reason: `高於平均 ${((ratio - 1) * 100).toFixed(1)}%` };
 }
 
 export function getLastFetchedAt(tripId) {

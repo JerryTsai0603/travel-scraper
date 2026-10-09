@@ -4,6 +4,7 @@ import express from 'express';
 import {
   listTrips, getTrip, upsertTrip, deleteTrip,
   appendHistory, getHistory, summarizeTrip, pickCheapest,
+  priceStats, evaluateBelowAverage,
   recordFetch, recordAlert, shouldAlert, daysUntil,
 } from './data.js';
 import { resolveProviders, listProviders } from './providers/index.js';
@@ -162,15 +163,39 @@ export async function runFetchForTrip(trip) {
   appendHistory(trip.id, snapshot);
   recordFetch(trip.id, now);
 
-  // 警報：若 bestPrice 落在門檻以下，發通知
-  if (Number.isFinite(snapshot.bestPrice) && Number.isFinite(trip.threshold) && snapshot.bestPrice <= trip.threshold) {
-    const thresholdHash = `${trip.threshold}|${trip.kind}|${providers.map((p) => p.id).join(',')}`;
+  // 重新讀歷史（剛 append 進去的那筆也要算）
+  const history = getHistory(trip.id);
+  const mode = trip.alertMode || 'both';
+  const decisions = [];
+
+  // 規則 A：低於歷史平均（冷啟動保護：至少 3 筆才參考）
+  if (mode === 'below-average' || mode === 'both') {
+    const ev = evaluateBelowAverage(snapshot, history, { requireSamples: 3, ratioThreshold: 0.95 });
+    if (ev?.shouldAlert) decisions.push({ ...ev, alertKey: 'avg' });
+  }
+
+  // 規則 B：低於用戶設的門檻
+  if (mode === 'threshold' || mode === 'both') {
+    if (Number.isFinite(snapshot.bestPrice) && Number.isFinite(trip.threshold) && snapshot.bestPrice <= trip.threshold) {
+      decisions.push({
+        kind: 'below-threshold',
+        shouldAlert: true,
+        threshold: trip.threshold,
+        reason: `低於門檻 ${trip.currency || 'TWD'} ${Math.round(trip.threshold).toLocaleString('zh-Hant')}`,
+        alertKey: 'thr',
+      });
+    }
+  }
+
+  // 去重後發通知
+  for (const d of decisions) {
+    const thresholdHash = `${d.alertKey}|${mode}|${trip.kind}|${providers.map((p) => p.id).join(',')}`;
     if (shouldAlert(trip.id, thresholdHash)) {
-      await notifyPriceAlert({ trip, snapshot, threshold: trip.threshold, kind: trip.kind });
+      await notifyPriceAlert({ trip, snapshot, decision: d, mode });
       recordAlert(trip.id, thresholdHash, now);
     }
   }
-  return { snapshot, queued: true };
+  return { snapshot, queued: true, decisions };
 }
 
 function defaultTrip(kindFromQuery) {

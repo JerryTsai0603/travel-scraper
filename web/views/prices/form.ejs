@@ -121,8 +121,17 @@
 
   <div class="filter-row">
     <label class="filter">
-      <span>價格門檻（低於時通知）</span>
+      <span>價格門檻（低於時通知，可選）</span>
       <input type="number" name="threshold" value="<%= t.threshold ?? '' %>" placeholder="例：25000" min="0"/>
+    </label>
+    <label class="filter">
+      <span>警報模式</span>
+      <select name="alertMode">
+        <option value="below-average"  <%= (t.alertMode || 'below-average') === 'below-average'  ? 'selected' : '' %>>低於平均價格（自動）</option>
+        <option value="threshold"      <%= t.alertMode === 'threshold'      ? 'selected' : '' %>>低於自訂門檻</option>
+        <option value="both"           <%= t.alertMode === 'both'           ? 'selected' : '' %>>兩者皆通知</option>
+        <option value="off"            <%= t.alertMode === 'off'            ? 'selected' : '' %>>關閉通知</option>
+      </select>
     </label>
     <label class="filter grow">
       <span>備註</span>
