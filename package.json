@@ -1,0 +1,30 @@
+{
+  "name": "daily-scraper",
+  "version": "0.1.0",
+  "description": "Daily scraper for Jable.tv + missav123.com videos tagged 絲襪 + 腳交 with Chinese subtitles",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "run": "node src/index.js --once",
+    "schedule": "node src/scheduler.js",
+    "web": "node web/server.js",
+    "prices:scheduler": "node web/prices/scheduler.js",
+    "test": "node test/smoke.mjs && node test/import.mjs",
+    "install-task": "powershell -ExecutionPolicy Bypass -File scripts/install-task.ps1",
+    "uninstall-task": "powershell -ExecutionPolicy Bypass -File scripts/uninstall-task.ps1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "node-cron": "^3.0.3",
+    "p-limit": "^6.1.0"
+  }
+}

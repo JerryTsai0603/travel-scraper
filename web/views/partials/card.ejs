@@ -1,0 +1,58 @@
+<% const thumbSrc = r.thumbnail
+     ? (r.thumbnail.startsWith('data:') ? r.thumbnail : `/thumb?url=${encodeURIComponent(r.thumbnail)}`)
+     : ''; %>
+<% const href = `/video/${r.site}/${enc(r.url)}`; %>
+<article class="card" data-site="<%= r.site %>" data-tags="<%= (r.tags||[]).join(',') %>" data-performers="<%= (r.performers||[]).join(',') %>" data-url="<%= r.url %>">
+  <div class="thumb site-tint-<%= r.site %>">
+    <% if (thumbSrc) { %>
+      <img loading="lazy" src="<%= thumbSrc %>" alt="<%= r.title || '' %>" onerror="this.classList.add('broken');">
+    <% } else { %>
+      <div class="thumb-fallback">無縮圖</div>
+    <% } %>
+    <div class="thumb-broken-fallback">
+      <div class="thumb-broken-title"><%= r.title || '(未命名)' %></div>
+      <div class="thumb-broken-hint">縮圖載入失敗</div>
+    </div>
+    <span class="site-badge site-<%= r.site %>"><%= r.site %></span>
+    <span class="watched-overlay">已看 ✓</span>
+  </div>
+  <div class="card-body">
+    <div class="card-top">
+      <h3 class="title"><a href="<%= href %>"><%= r.title || '(未命名)' %></a></h3>
+      <div class="card-actions">
+        <button type="button" class="act-btn" data-act="favorite" data-title-on="已收藏（點擊取消）" data-title-off="加入收藏">☆</button>
+        <button type="button" class="act-btn" data-act="watched" data-title-on="已看過（點擊取消）" data-title-off="標記為已看">○</button>
+      </div>
+    </div>
+    <div class="meta">
+      <% if (r.capturedDate) { %><span class="meta-item" title="收錄日期">📅 <%= r.capturedDate %></span><% } %>
+      <% if (r.publishedAt) { %><span class="meta-item" title="發佈時間">🕒 <%= new Date(r.publishedAt).toISOString().slice(0,10) %></span><% } %>
+      <% if (r.duration) { %><span class="meta-item" title="時長">⏱ <%= r.duration %></span><% } %>
+    </div>
+    <% if (r.performers && r.performers.length) { %>
+      <div class="performers">
+        <span class="label">演員：</span>
+        <% r.performers.slice(0, 4).forEach(function(p) { %>
+          <a class="chip performer" href="/?performer=<%= encodeURIComponent(p) %>"><%= p %></a>
+        <% }) %>
+        <% if (r.performers.length > 4) { %><span class="more">+<%= r.performers.length - 4 %></span><% } %>
+      </div>
+    <% } %>
+    <% if (r.tags && r.tags.length) { %>
+      <div class="tags">
+        <% r.tags.slice(0, 6).forEach(function(t) { %>
+          <a class="chip tag" href="/?tag=<%= encodeURIComponent(t) %>"><%= t %></a>
+        <% }) %>
+        <% if (r.tags.length > 6) { %><span class="more">+<%= r.tags.length - 6 %></span><% } %>
+      </div>
+    <% } %>
+    <div class="card-foot">
+      <a class="open" target="_blank" rel="noopener" href="<%= r.url %>">開啟原站 ↗</a>
+      <div class="card-foot-right">
+        <button type="button" class="mini-btn" data-copy="<%= r.url %>" title="複製影片連結">🔗 連結</button>
+        <% if (r.thumbnail) { %><button type="button" class="mini-btn" data-copy="<%= r.thumbnail %>" title="複製縮圖連結">🖼 縮圖</button><% } %>
+        <span class="subtitle" title="字幕證據"><%= r.subtitleEvidence || '—' %></span>
+      </div>
+    </div>
+  </div>
+</article>

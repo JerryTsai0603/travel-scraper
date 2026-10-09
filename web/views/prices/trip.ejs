@@ -1,0 +1,200 @@
+<%- include('../partials/header') %>
+
+<%
+  const trip = summary.trip;
+  const last = summary.lastSnapshot;
+  const cheapest = summary.cheapestSnapshot;
+  const threshold = trip.threshold;
+  const alerted = last && Number.isFinite(last.bestPrice) && Number.isFinite(threshold) && last.bestPrice <= threshold;
+  const days = summary.daysToDepart;
+  const priceSeries = history.map(function(h) { return { t: h.capturedAt, p: h.bestPrice, currency: h.currency, provider: h.provider }; }).filter(function(x) { return Number.isFinite(x.p) && x.p > 0; });
+  const maxPrice = priceSeries.reduce((m, x) => Math.max(m, x.p), 0);
+  const minPrice = priceSeries.reduce((m, x) => Math.min(m, x.p), Infinity);
+  const range = Math.max(1, maxPrice - minPrice);
+  const W = 720, H = 220, PAD = 28;
+  const points = priceSeries.map(function(x, i) {
+    const x0 = priceSeries.length === 1 ? W / 2 : PAD + (i / (priceSeries.length - 1)) * (W - PAD * 2);
+    const y0 = H - PAD - ((x.p - minPrice) / range) * (H - PAD * 2);
+    return { x: x0, y: y0, meta: x };
+  });
+%>
+
+<section class="hero">
+  <div class="hero-row">
+    <h1>
+      <span class="kind-badge <%= trip.kind %> inline"><%= trip.kind === 'flight' ? '✈️' : '🏨' %></span>
+      <%= trip.name %>
+    </h1>
+    <div class="hero-actions">
+      <form method="post" action="/prices/trip/<%= trip.id %>/fetch">
+        <button type="submit" class="btn primary">↻ 立即抓取</button>
+      </form>
+      <a class="btn" href="/prices/trip/<%= trip.id %>/edit">✏️ 編輯</a>
+      <form method="post" action="/prices/trip/<%= trip.id %>/delete" onsubmit="return confirm('確定刪除此追蹤？歷史資料也會一併移除');">
+        <button type="submit" class="btn danger">🗑 刪除</button>
+      </form>
+    </div>
+  </div>
+  <p class="hero-sub">
+    <% if (trip.kind === 'flight') { %>
+      ✈️ <%= trip.origin %> → <%= trip.destination %> · <%= trip.departDate || '未定' %> → <%= trip.returnDate || '未定' %> · <%= trip.cabinClass %> × <%= trip.adults %>
+    <% } else { %>
+      🏨 <%= trip.hotelCity %> · <%= trip.hotelCheckIn || '未定' %> → <%= trip.hotelCheckOut || '未定' %> · <%= trip.roomType %> × <%= trip.adults %>
+    <% } %>
+    <% if (days != null) { %>
+      　⏳
+      <% if (days < 0) { %>已出發 <%= -days %> 天<% } else if (days === 0) { %>今天出發<% } else { %>還有 <%= days %> 天<% } %>
+    <% } %>
+    <% if (threshold) { %>
+      　🎯 門檻 <%= trip.currency %> <%= Math.round(threshold).toLocaleString('zh-Hant') %>
+    <% } %>
+  </p>
+</section>
+
+<section class="panel summary-panel">
+  <h2>📈 價格趨勢</h2>
+  <% if (priceSeries.length < 2) { %>
+    <div class="empty-card mini">
+      <p>歷史資料不足，請至少抓取 2 次後才會顯示趨勢圖。</p>
+      <p class="muted">目前 <%= summary.historyCount %> 筆資料。</p>
+    </div>
+  <% } else { %>
+    <div class="chart-wrap">
+      <svg viewBox="0 0 <%= W %> <%= H %>" class="price-chart" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(255, 111, 145, 0.45)"/>
+            <stop offset="100%" stop-color="rgba(255, 111, 145, 0.02)"/>
+          </linearGradient>
+        </defs>
+        <line x1="<%= PAD %>" y1="<%= H - PAD %>" x2="<%= W - PAD %>" y2="<%= H - PAD %>" stroke="var(--border)"/>
+        <line x1="<%= PAD %>" y1="<%= PAD %>" x2="<%= PAD %>" y2="<%= H - PAD %>" stroke="var(--border)"/>
+        <%
+          // y-axis labels
+          for (let k = 0; k <= 3; k++) {
+            const ratio = k / 3;
+            const yv = minPrice + (maxPrice - minPrice) * (1 - ratio);
+            const yp = PAD + ratio * (H - PAD * 2);
+        %>
+          <line x1="<%= PAD %>" y1="<%= yp %>" x2="<%= W - PAD %>" y2="<%= yp %>" stroke="var(--border)" stroke-dasharray="2 4" opacity="0.4"/>
+          <text x="<%= PAD - 6 %>" y="<%= yp + 3 %>" text-anchor="end" font-size="10" fill="var(--fg-dim)"><%= Math.round(yv).toLocaleString('zh-Hant') %></text>
+        <% } %>
+        <%
+          // threshold line
+          if (threshold && threshold >= minPrice && threshold <= maxPrice) {
+            const ty = H - PAD - ((threshold - minPrice) / range) * (H - PAD * 2);
+        %>
+          <line x1="<%= PAD %>" y1="<%= ty %>" x2="<%= W - PAD %>" y2="<%= ty %>" stroke="#ffb86f" stroke-dasharray="4 4" stroke-width="1.5"/>
+          <text x="<%= W - PAD %>" y="<%= ty - 4 %>" text-anchor="end" font-size="10" fill="#ffb86f">門檻 <%= Math.round(threshold).toLocaleString('zh-Hant') %></text>
+        <% } %>
+        <% if (points.length > 1) { %>
+          <polygon fill="url(#areaFill)" points="<%= points.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ') %> <%= W - PAD %>,<%= H - PAD %> <%= PAD %>,<%= H - PAD %>"/>
+          <polyline fill="none" stroke="var(--accent)" stroke-width="2" points="<%= points.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ') %>"/>
+        <% } %>
+        <% points.forEach(function(p) { %>
+          <circle cx="<%= p.x.toFixed(1) %>" cy="<%= p.y.toFixed(1) %>" r="3.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"/>
+        <% }) %>
+      </svg>
+      <div class="chart-axis">
+        <span><%= priceSeries[0].t.slice(0, 10) %></span>
+        <span><%= priceSeries[priceSeries.length-1].t.slice(0, 10) %></span>
+      </div>
+    </div>
+  <% } %>
+
+  <div class="price-stats">
+    <div class="stat-card">
+      <div class="stat-num"><%= last && Number.isFinite(last.bestPrice) ? Math.round(last.bestPrice).toLocaleString('zh-Hant') : '—' %></div>
+      <div class="stat-label">目前最低（<%= (last && last.currency) || trip.currency || 'TWD' %>）</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num"><%= cheapest && Number.isFinite(cheapest.bestPrice) ? Math.round(cheapest.bestPrice).toLocaleString('zh-Hant') : '—' %></div>
+      <div class="stat-label">歷史最低（<%= (cheapest && cheapest.currency) || trip.currency || 'TWD' %>）</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num"><%= summary.historyCount %></div>
+      <div class="stat-label">抓取筆數</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num"><%= alerted ? '🚨 是' : '—' %></div>
+      <div class="stat-label">觸發門檻</div>
+    </div>
+  </div>
+</section>
+
+<% if (last && Array.isArray(last.flights) && last.flights.length) { %>
+  <section class="panel">
+    <h2>✈️ 最近航班</h2>
+    <table class="results-table">
+      <thead><tr><th>航空公司</th><th>航班</th><th>出發</th><th>抵達</th><th class="num">時長</th><th class="num">停留</th><th class="num">價格</th></tr></thead>
+      <tbody>
+        <% last.flights.forEach(function(f) { %>
+          <tr>
+            <td><%= f.carrier %></td>
+            <td><%= f.flightNo %></td>
+            <td><%= new Date(f.departAt).toLocaleString('zh-Hant') %></td>
+            <td><%= new Date(f.arriveAt).toLocaleString('zh-Hant') %></td>
+            <td class="num"><%= Math.round(f.durationMin) %> 分</td>
+            <td class="num"><%= f.stops === 0 ? '直飛' : f.stops + ' 轉' %></td>
+            <td class="num"><%= (last.currency || trip.currency) %> <%= Math.round(f.price).toLocaleString('zh-Hant') %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </section>
+<% } %>
+
+<% if (last && Array.isArray(last.hotels) && last.hotels.length) { %>
+  <section class="panel">
+    <h2>🏨 最近住宿</h2>
+    <% if (last.meta && last.meta.center) { %>
+      <div id="hotelMap" class="map-canvas" data-lat="<%= last.meta.center.lat %>" data-lng="<%= last.meta.center.lng %>" data-radius="<%= last.meta.radiusKm %>"></div>
+      <p class="muted map-legend">中心（<%= last.meta.center.lat.toFixed(4) %>, <%= last.meta.center.lng.toFixed(4) %>）｜半徑 <%= last.meta.radiusKm %> km｜共 <%= last.meta.total %> 筆，<%= last.meta.inRangeCount %> 筆在半徑內</p>
+    <% } %>
+    <table class="results-table">
+      <thead><tr><th>飯店</th><th>星等</th><th class="num">評分</th><th class="num">評論數</th><th class="num">距離</th><th class="num">每晚</th><th class="num">總價</th></tr></thead>
+      <tbody>
+        <% last.hotels.forEach(function(h) { %>
+          <tr>
+            <td><%= h.name %><br><small class="muted"><%= h.address %></small></td>
+            <td><%= '★'.repeat(Math.round(h.stars)) %></td>
+            <td class="num"><%= (h.rating || 0).toFixed(1) %></td>
+            <td class="num"><%= (h.reviewCount || 0).toLocaleString('zh-Hant') %></td>
+            <td class="num"><%= (h.distanceKm != null) ? (h.distanceKm + ' km') : '—' %></td>
+            <td class="num"><%= (last.currency || trip.currency) %> <%= Math.round(h.pricePerNight).toLocaleString('zh-Hant') %></td>
+            <td class="num"><%= (last.currency || trip.currency) %> <%= Math.round(h.totalPrice).toLocaleString('zh-Hant') %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </section>
+<% } %>
+
+<section class="panel">
+  <h2>📜 抓取記錄</h2>
+  <% if (history.length === 0) { %>
+    <p class="muted">尚無記錄，按一下「立即抓取」就會開始累積。</p>
+  <% } else { %>
+    <table class="results-table">
+      <thead><tr><th>時間</th><th>來源</th><th>類型</th><th class="num">最低價</th><th>備註</th></tr></thead>
+      <tbody>
+        <% history.slice().reverse().slice(0, 30).forEach(function(h) { %>
+          <tr>
+            <td><%= new Date(h.capturedAt).toLocaleString('zh-Hant') %></td>
+            <td><%= h.provider %></td>
+            <td><%= h.bestKind || trip.kind %></td>
+            <td class="num">
+              <% if (Number.isFinite(h.bestPrice) && h.bestPrice > 0) { %>
+                <%= (h.currency || trip.currency) %> <%= Math.round(h.bestPrice).toLocaleString('zh-Hant') %>
+              <% } else { %>—<% } %>
+            </td>
+            <td><% if (h.error) { %><span class="badge alert"><%= h.error %></span><% } %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <p class="muted">顯示最近 30 筆 · <a href="/prices/api/trips/<%= trip.id %>/history.csv">下載 CSV</a></p>
+  <% } %>
+</section>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,93 @@
+<%- include('../partials/header') %>
+
+<section class="hero">
+  <div class="hero-row">
+    <h1>💸 價格監控</h1>
+    <div class="hero-actions">
+      <a class="btn primary" href="/prices/new">+ 新增追蹤</a>
+      <a class="btn" href="/prices/new?kind=hotel">+ 住宿</a>
+    </div>
+  </div>
+  <p class="hero-sub">
+    追蹤 <%= trips.length %> 個行程 ｜ 資料來源：
+    <% providers.forEach(function(p, i) { %>
+      <span class="prov-chip"><%= p.label %></span><% if (i < providers.length - 1) { %><% } %>
+    <% }) %>
+  </p>
+</section>
+
+<% if (trips.length === 0) { %>
+  <section class="empty-card">
+    <h2>還沒有任何追蹤</h2>
+    <p>新增一個機票或住宿追蹤，系統會定期抓取價格並畫出趨勢圖。</p>
+    <div class="empty-actions">
+      <a class="btn primary" href="/prices/new">+ 建立第一個追蹤</a>
+      <a class="btn" href="/prices/new?kind=hotel">+ 住宿追蹤</a>
+    </div>
+    <p class="muted">
+      預設使用 Mock provider，所以即使沒有真實 API 也可以立刻看到完整 UI。<br>
+      之後想接 Skyscanner / Amadeus / Booking 只要在 <code>web/prices/providers/</code> 新增 adapter。
+    </p>
+  </section>
+<% } else { %>
+  <section class="trip-grid">
+    <% trips.forEach(function(s) {
+      const trip = s.trip; const last = s.lastSnapshot; const lastPrice = last ? last.bestPrice : null;
+      const threshold = trip.threshold;
+      const alerted = lastPrice != null && threshold != null && lastPrice <= threshold;
+      const days = s.daysToDepart;
+    %>
+      <article class="trip-card kind-<%= trip.kind %>">
+        <div class="trip-head">
+          <span class="kind-badge <%= trip.kind %>"><%= trip.kind === 'flight' ? '✈️ 機票' : '🏨 住宿' %></span>
+          <h3><a href="/prices/trip/<%= trip.id %>"><%= trip.name %></a></h3>
+        </div>
+        <div class="trip-body">
+          <ul class="trip-meta">
+            <% if (trip.kind === 'flight') { %>
+                <li><%= trip.origin || '?' %> → <%= trip.destination || '?' %></li>
+                <li><%= trip.departDate || '未定' %> → <%= trip.returnDate || '未定' %></li>
+                <li><%= trip.cabinClass || 'economy' %> × <%= trip.adults %></li>
+            <% } else { %>
+                <li>🏙 <%= trip.hotelCity || '?' %></li>
+                <li>📅 <%= trip.hotelCheckIn || '未定' %> → <%= trip.hotelCheckOut || '未定' %></li>
+                <li>🛏 <%= trip.roomType || 'standard' %> × <%= trip.adults %></li>
+            <% } %>
+              <li>📊 歷史 <%= s.historyCount %> 筆</li>
+              <li>⏱ 上次抓取 <%= s.lastFetchedAt ? new Date(s.lastFetchedAt).toLocaleString('zh-Hant') : '尚未抓取' %></li>
+            </ul>
+
+            <div class="trip-price">
+              <% if (lastPrice != null) { %>
+                <div class="price-now <%= alerted ? 'alert' : '' %>">
+                  <span class="cur"><%= last.currency || trip.currency || 'TWD' %></span>
+                  <span class="num"><%= Math.round(lastPrice).toLocaleString('zh-Hant') %></span>
+                  <% if (alerted) { %><span class="badge alert">低於門檻</span><% } %>
+                </div>
+              <% } else { %>
+                <div class="price-now muted">尚未抓到價格</div>
+              <% } %>
+              <% if (threshold) { %>
+                <div class="threshold">門檻 <%= trip.currency || 'TWD' %> <%= Math.round(threshold).toLocaleString('zh-Hant') %></div>
+              <% } %>
+            </div>
+
+            <% if (days != null) { %>
+              <div class="countdown <%= days < 0 ? 'past' : (days < 14 ? 'soon' : '') %>">
+                <% if (days < 0) { %>已出發 <%= -days %> 天<% } else if (days === 0) { %>今天出發<% } else { %>還有 <%= days %> 天出發<% } %>
+              </div>
+            <% } %>
+          </div>
+        <div class="trip-foot">
+          <a class="btn small" href="/prices/trip/<%= trip.id %>">查看 →</a>
+          <form method="post" action="/prices/trip/<%= trip.id %>/fetch" style="display:inline">
+            <button type="submit" class="btn small ghost">立即抓取</button>
+          </form>
+          <a class="btn small ghost" href="/prices/trip/<%= trip.id %>/edit">編輯</a>
+        </div>
+      </article>
+    <% }) %>
+  </section>
+<% } %>
+
+<%- include('../partials/footer') %>

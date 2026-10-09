@@ -1,0 +1,73 @@
+<%- include('partials/header') %>
+
+<% const thumbSrc = video.thumbnail ? `/thumb?url=${encodeURIComponent(video.thumbnail)}` : ''; %>
+<section class="video-detail" data-detail-url="<%= video.url %>">
+  <div class="video-thumb">
+    <% if (thumbSrc) { %>
+      <img src="<%= thumbSrc %>" alt="<%= video.title || '' %>" onerror="this.classList.add('broken');this.removeAttribute('src');">
+    <% } else { %><div class="thumb-fallback large">無縮圖</div><% } %>
+  </div>
+  <div class="video-info">
+    <h1><%= video.title || '(未命名)' %></h1>
+    <p class="video-source">
+      <a target="_blank" rel="noopener" href="<%= video.url %>">在 <%= video.site %> 開啟 ↗</a>
+      ｜收錄：<%= video.capturedDate %>
+    </p>
+    <div class="video-actions">
+      <button type="button" class="act-btn" data-act="favorite" data-title-on="已收藏（點擊取消）" data-title-off="加入收藏">☆ 收藏</button>
+      <button type="button" class="act-btn" data-act="watched" data-title-on="已看過（點擊取消）" data-title-off="標記為已看">○ 標記為已看</button>
+    </div>
+
+    <section class="url-block">
+      <h3>🔗 影片連結（可複製）</h3>
+      <div class="copy-row">
+        <input class="copy-input" type="text" readonly value="<%= video.url %>" onclick="this.select()">
+        <button type="button" class="mini-btn" data-copy="<%= video.url %>">複製</button>
+        <a class="mini-btn" target="_blank" rel="noopener" href="<%= video.url %>">開啟 ↗</a>
+      </div>
+
+      <% if (video.thumbnail) { %>
+        <h3>🖼 縮圖連結</h3>
+        <div class="copy-row">
+          <input class="copy-input" type="text" readonly value="<%= video.thumbnail %>" onclick="this.select()">
+          <button type="button" class="mini-btn" data-copy="<%= video.thumbnail %>">複製</button>
+          <a class="mini-btn" target="_blank" rel="noopener" href="<%= video.thumbnail %>">開啟 ↗</a>
+        </div>
+        <p class="thumb-preview">
+          <img src="<%= thumbSrc %>" alt="thumbnail preview" onerror="this.classList.add('broken');this.removeAttribute('src');">
+        </p>
+      <% } %>
+    </section>
+
+    <dl class="info-list">
+      <% if (video.publishedAt) { %><dt>發佈</dt><dd><%= video.publishedAt %></dd><% } %>
+      <% if (video.duration) { %><dt>時長</dt><dd><%= video.duration %></dd><% } %>
+      <% if (video.subtitleEvidence) { %><dt>字幕</dt><dd><%= video.subtitleEvidence %></dd><% } %>
+      <% if (video.matchedTags && video.matchedTags.length) { %>
+        <dt>命中標籤</dt><dd>
+          <% video.matchedTags.forEach(function(t) { %>
+            <a class="chip tag" href="/?tag=<%= encodeURIComponent(t) %>"><%= t %></a>
+          <% }) %>
+        </dd>
+      <% } %>
+      <% if (video.tags && video.tags.length) { %>
+        <dt>所有標籤</dt><dd>
+          <% video.tags.forEach(function(t) { %>
+            <a class="chip tag" href="/?tag=<%= encodeURIComponent(t) %>"><%= t %></a>
+          <% }) %>
+        </dd>
+      <% } %>
+      <% if (video.performers && video.performers.length) { %>
+        <dt>演員</dt><dd>
+          <% video.performers.forEach(function(p) { %>
+            <a class="chip performer" href="/?performer=<%= encodeURIComponent(p) %>"><%= p %></a>
+          <% }) %>
+        </dd>
+      <% } %>
+      <% if (video.capturedAt) { %><dt>抓取時間</dt><dd><%= video.capturedAt %></dd><% } %>
+    </dl>
+    <a class="back" href="/">← 回首頁</a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

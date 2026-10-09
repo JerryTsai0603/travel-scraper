@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+
+<section class="hero">
+  <h1>每日爬蟲結果彙整</h1>
+  <p class="hero-sub">
+    篩選條件：<strong>絲襪 + 腳交 + 中文字幕</strong>
+    ｜共 <strong><%= stats.total %></strong> 筆影片，<strong><%= stats.dates.length %></strong> 天資料
+    ｜已收藏 <strong data-count="favorite">0</strong> ｜已看 <strong data-count="watched">0</strong>
+    <% if (latestDate) { %>｜最新：<strong><%= latestDate %></strong><% } %>
+  </p>
+</section>
+
+<%- include('partials/filters', { filter }) %>
+
+<%- include('partials/trend', { stats }) %>
+
+<section class="stats">
+  <div class="stat-card">
+    <div class="stat-num"><%= stats.total %></div>
+    <div class="stat-label">總影片</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num"><%= stats.bySite.jable || 0 %></div>
+    <div class="stat-label">Jable</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num"><%= stats.bySite.missav || 0 %></div>
+    <div class="stat-label">missav</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num"><%= stats.topPerformers.length %></div>
+    <div class="stat-label">不重複演員</div>
+  </div>
+</section>
+
+<% if (stats.topTags.length || stats.topPerformers.length) { %>
+<section class="chips-block">
+  <% if (stats.topTags.length) { %>
+    <details open class="chips-group">
+      <summary>熱門標籤（Top <%= stats.topTags.length %>）</summary>
+      <div class="chips">
+        <% stats.topTags.forEach(function([t, n]) { %>
+          <a class="chip tag" href="/?tag=<%= encodeURIComponent(t) %>"><%= t %> <span class="count"><%= n %></span></a>
+        <% }) %>
+      </div>
+    </details>
+  <% } %>
+  <% if (stats.topPerformers.length) { %>
+    <details class="chips-group">
+      <summary>熱門演員（Top <%= stats.topPerformers.length %>）</summary>
+      <div class="chips">
+        <% stats.topPerformers.forEach(function([p, n]) { %>
+          <a class="chip performer" href="/?performer=<%= encodeURIComponent(p) %>"><%= p %> <span class="count"><%= n %></span></a>
+        <% }) %>
+      </div>
+    </details>
+  <% } %>
+</section>
+<% } %>
+
+<section class="results">
+  <div class="results-head">
+    <h2>命中影片（<%= results.length %>）</h2>
+    <div class="sort">
+      <label>排序：
+        <select id="sort">
+          <option value="date-desc">最新收錄</option>
+          <option value="date-asc">最舊收錄</option>
+          <option value="published-desc">發佈時間（新→舊）</option>
+          <option value="title">標題 A→Z</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <% if (!results.length) { %>
+    <div class="empty-block">目前沒有符合條件的影片。先跑一次 <code>npm run run</code> 收集資料。</div>
+  <% } else { %>
+    <div class="grid" id="grid">
+      <% results.forEach(function(r) { %>
+        <%- include('partials/card', { r }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<%- include('partials/footer') %>

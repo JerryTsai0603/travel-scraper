@@ -1,0 +1,15 @@
+node_modules/
+data/
+.env
+clean/
+npm-debug.log*
+web/public/thumbs/
+web/.boot.log
+web/.boot.err.log
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+scripts/_test.cmd
+scripts/test-deploy.cmd

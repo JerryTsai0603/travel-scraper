@@ -1,0 +1,40 @@
+# render.yaml
+# Render Blueprint: 把這個檔推到 GitHub repo 根目錄，
+# 然後到 https://dashboard.render.com/connect 選你的 repo，
+# Render 會自動建立 Web Service。
+#
+# 注意事項：
+#  - free 方案會在 15 分鐘無流量後 sleep，喚醒時第一次請求會慢 30 秒
+#  - data/ 是 ephemeral（重啟清空）。要保留歷史請加 Render Disk（$1/月/GB）
+#  - .env 內的 TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID / DISCORD_WEBHOOK_URL
+#    請到 Render Dashboard > Environment 手動加入（不要 push 上 GitHub）
+
+services:
+  - type: web
+    name: daily-scraper-web
+    runtime: node
+    plan: free               # 改成 "starter" ($7/月) 就 always-on
+    region: singapore         # 離台灣最近
+    branch: main
+    buildCommand: npm install
+    startCommand: node web/server.js
+    healthCheckPath: /prices
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: PRICES_SCHEDULER
+        value: "true"          # 雲端也跑排程（必要時改 false）
+      - key: AUTO_PORT
+        value: "false"         # Render 會注入 PORT，直接 listen 該 port
+      # ↓ 把你的 secrets 加到 Render Dashboard，不要寫在這裡
+      # - key: TELEGRAM_BOT_TOKEN
+      #   sync: false
+      # - key: TELEGRAM_CHAT_ID
+      #   sync: false
+      # - key: DISCORD_WEBHOOK_URL
+      #   sync: false
+    # disk:                          # 取消註解就會掛 1GB 持久磁碟（$1/月）
+    #   name: data
+    #   mountPath: /opt/render/project/src/data
+    #   sizeGB: 1

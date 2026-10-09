@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+
+<section class="hero">
+  <h1>歷史彙總</h1>
+  <p class="hero-sub">
+    共 <strong><%= dates.length %></strong> 天的結果資料
+    ｜總影片 <strong><%= stats.total %></strong>
+  </p>
+</section>
+
+<section class="history-grid">
+  <div class="panel">
+    <h2>每日數量</h2>
+    <table class="history-table">
+      <thead><tr><th>日期</th><th class="num">影片數</th><th></th></tr></thead>
+      <tbody>
+        <% stats.dates.forEach(function([d, n]) { %>
+          <tr>
+            <td><a href="/date/<%= d %>"><%= d %></a></td>
+            <td class="num"><%= n %></td>
+            <td class="bar-cell"><div class="bar" style="width:<%= Math.min(100, n * 12) %>%"></div></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Top 標籤</h2>
+    <div class="chips">
+      <% stats.topTags.forEach(function([t, n]) { %>
+        <a class="chip tag" href="/?tag=<%= encodeURIComponent(t) %>"><%= t %> <span class="count"><%= n %></span></a>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Top 演員</h2>
+    <div class="chips">
+      <% stats.topPerformers.forEach(function([p, n]) { %>
+        <a class="chip performer" href="/?performer=<%= encodeURIComponent(p) %>"><%= p %> <span class="count"><%= n %></span></a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

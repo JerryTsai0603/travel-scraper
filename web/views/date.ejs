@@ -1,0 +1,26 @@
+<%- include('partials/header') %>
+
+<section class="hero">
+  <h1><%= payload.date %> 結果</h1>
+  <p class="hero-sub">
+    生成時間：<%= payload.generatedAt %>
+    ｜共 <strong><%= results.length %></strong> / <%= payload.count %> 筆命中
+    <a class="back" href="/">← 回首頁</a>
+  </p>
+</section>
+
+<%- include('partials/filters', { filter }) %>
+
+<section class="results">
+  <% if (!results.length) { %>
+    <div class="empty-block">當日或篩選條件下沒有命中。</div>
+  <% } else { %>
+    <div class="grid">
+      <% results.forEach(function(r) { %>
+        <%- include('partials/card', { r }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<%- include('partials/footer') %>

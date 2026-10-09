@@ -1,0 +1,155 @@
+<%- include('../partials/header') %>
+
+<%
+  const t = trip;
+  const isFlight = t.kind === 'flight';
+%>
+
+<section class="hero">
+  <div class="hero-row">
+    <h1><%= mode === 'new' ? '+ 新增追蹤' : '✏️ 編輯追蹤' %></h1>
+    <div class="hero-actions">
+      <a class="btn" href="/prices">← 返回</a>
+    </div>
+  </div>
+</section>
+
+<% if (error) { %>
+  <div class="alert danger"><%= error %></div>
+<% } %>
+
+<form class="filter-form" method="post" action="<%= mode === 'new' ? '/prices/new' : `/prices/trip/${t.id}/edit` %>">
+  <div class="filter-row">
+    <label class="filter">
+      <span>類型</span>
+      <select name="kind" <%= mode === 'edit' ? 'disabled' : '' %>>
+        <option value="flight" <%= isFlight ? 'selected' : '' %>>✈️ 機票</option>
+        <option value="hotel"  <%= !isFlight ? 'selected' : '' %>>🏨 住宿</option>
+      </select>
+      <% if (mode === 'edit') { %><input type="hidden" name="kind" value="<%= t.kind %>"/><% } %>
+    </label>
+    <label class="filter grow">
+      <span>名稱</span>
+      <input type="text" name="name" value="<%= t.name || '' %>" placeholder="例：東京 11 月滑雪" required maxlength="80"/>
+    </label>
+    <label class="filter">
+      <span>人數</span>
+      <input type="number" name="adults" value="<%= t.adults || 1 %>" min="1" max="9"/>
+    </label>
+    <label class="filter">
+      <span>幣別</span>
+      <input type="text" name="currency" value="<%= t.currency || 'TWD' %>" maxlength="6"/>
+    </label>
+  </div>
+
+  <% if (isFlight) { %>
+    <div class="filter-row">
+      <label class="filter">
+        <span>出發機場 (IATA)</span>
+        <input type="text" name="origin" value="<%= t.origin || 'TPE' %>" maxlength="8"/>
+      </label>
+      <label class="filter">
+        <span>目的地機場 (IATA)</span>
+        <input type="text" name="destination" value="<%= t.destination || 'NRT' %>" maxlength="8"/>
+      </label>
+      <label class="filter">
+        <span>出發日期</span>
+        <input type="date" name="departDate" value="<%= t.departDate || '' %>"/>
+      </label>
+      <label class="filter">
+        <span>回程日期</span>
+        <input type="date" name="returnDate" value="<%= t.returnDate || '' %>"/>
+      </label>
+      <label class="filter">
+        <span>艙等</span>
+        <select name="cabinClass">
+          <option value="economy"          <%= t.cabinClass === 'economy' ? 'selected' : '' %>>經濟艙</option>
+          <option value="premium_economy"  <%= t.cabinClass === 'premium_economy' ? 'selected' : '' %>>豪華經濟艙</option>
+          <option value="business"         <%= t.cabinClass === 'business' ? 'selected' : '' %>>商務艙</option>
+          <option value="first"            <%= t.cabinClass === 'first' ? 'selected' : '' %>>頭等艙</option>
+        </select>
+      </label>
+    </div>
+  <% } else { %>
+    <div class="filter-row">
+      <label class="filter">
+        <span>城市</span>
+        <input type="text" name="hotelCity" value="<%= t.hotelCity || '' %>" placeholder="Tokyo" maxlength="60"/>
+      </label>
+      <label class="filter">
+        <span>入住日期</span>
+        <input type="date" name="hotelCheckIn" value="<%= t.hotelCheckIn || '' %>"/>
+      </label>
+      <label class="filter">
+        <span>退房日期</span>
+        <input type="date" name="hotelCheckOut" value="<%= t.hotelCheckOut || '' %>"/>
+      </label>
+      <label class="filter">
+        <span>房型</span>
+        <select name="roomType">
+          <option value="standard" <%= t.roomType === 'standard' ? 'selected' : '' %>>標準房</option>
+          <option value="deluxe"   <%= t.roomType === 'deluxe' ? 'selected' : '' %>>豪華房</option>
+          <option value="suite"    <%= t.roomType === 'suite' ? 'selected' : '' %>>套房</option>
+        </select>
+      </label>
+    </div>
+    <div class="map-picker">
+      <div class="map-picker-head">
+        <h3>📍 地圖框選範圍（可選）</h3>
+        <p class="muted">點地圖或拖曳 marker 設定中心；右下拉桿調整半徑（km）。沒設定會用城市預設座標。</p>
+      </div>
+      <div class="map-controls">
+        <label class="filter">
+          <span>中心緯度</span>
+          <input type="number" step="0.0001" name="hotelLat" id="hotelLat" value="<%= t.hotelLat ?? '' %>" placeholder="35.6895"/>
+        </label>
+        <label class="filter">
+          <span>中心經度</span>
+          <input type="number" step="0.0001" name="hotelLng" id="hotelLng" value="<%= t.hotelLng ?? '' %>" placeholder="139.6917"/>
+        </label>
+        <label class="filter">
+          <span>搜尋半徑（km）</span>
+          <input type="range" id="hotelRadiusSlider" min="0.5" max="30" step="0.5" value="<%= t.hotelRadiusKm ?? 3 %>"/>
+          <span class="radius-readout"><span id="hotelRadiusReadout"><%= t.hotelRadiusKm ?? 3 %></span> km</span>
+        </label>
+        <input type="hidden" name="hotelRadiusKm" id="hotelRadiusKm" value="<%= t.hotelRadiusKm ?? 3 %>"/>
+        <button type="button" class="btn ghost" id="mapResetBtn">回到城市預設</button>
+      </div>
+      <div id="mapPicker" class="map-canvas"></div>
+    </div>
+  <% } %>
+
+  <div class="filter-row">
+    <label class="filter">
+      <span>價格門檻（低於時通知）</span>
+      <input type="number" name="threshold" value="<%= t.threshold ?? '' %>" placeholder="例：25000" min="0"/>
+    </label>
+    <label class="filter grow">
+      <span>備註</span>
+      <input type="text" name="notes" value="<%= t.notes || '' %>" maxlength="600"/>
+    </label>
+  </div>
+
+  <div class="filter-row">
+    <label class="filter grow">
+      <span>Provider（複選）</span>
+      <div class="checkbox-row">
+        <% providers.forEach(function(p) {
+          const checked = (t.providers || ['mock']).includes(p.id);
+        %>
+          <label class="checkbox">
+            <input type="checkbox" name="providers" value="<%= p.id %>" <%= checked ? 'checked' : '' %>/>
+            <%= p.label %>
+          </label>
+        <% }) %>
+      </div>
+    </label>
+  </div>
+
+  <div class="filter-actions">
+    <button type="submit" class="btn primary"><%= mode === 'new' ? '建立' : '儲存' %></button>
+    <a class="btn ghost" href="/prices">取消</a>
+  </div>
+</form>
+
+<%- include('../partials/footer') %>

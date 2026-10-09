@@ -1,0 +1,53 @@
+{
+  "schedule": {
+    "cron": "0 8 * * *",
+    "timezone": "Asia/Taipei"
+  },
+  "filters": {
+    "requiredTags": {
+      "zh-Hant": ["絲襪", "腳交"],
+      "en": ["stockings", "footjob"]
+    },
+    "subtitle": {
+      "languages": ["zh-Hant", "zh-Hans", "zh-TW", "zh-CN", "zh"],
+      "labels": ["中文字幕", "繁體中字", "簡體中字", "Chinese", "Traditional Chinese", "Simplified Chinese"]
+    },
+    "maxAgeDays": 14
+  },
+  "sites": {
+    "jable": {
+      "enabled": true,
+      "baseUrl": "https://jable.tv",
+      "tagPages": [
+        "/tags/stockings/",
+        "/tags/%E7%B5%B2%E8%A6%86/",
+        "/tags/footjob/",
+        "/tags/%E8%85%B3%E4%BA%A4/"
+      ],
+      "maxPagesPerTag": 3
+    },
+    "missav": {
+      "enabled": true,
+      "baseUrl": "https://missav123.com",
+      "tagPages": [
+        "/genres/stockings",
+        "/genres/foot-fetish",
+        "/search/絲襪",
+        "/search/腳交"
+      ],
+      "maxPagesPerTag": 3
+    }
+  },
+  "http": {
+    "concurrency": 2,
+    "requestDelayMs": 2500,
+    "timeoutMs": 20000,
+    "maxRetries": 3,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0 Safari/537.36"
+  },
+  "output": {
+    "dir": "./data",
+    "writeJson": true,
+    "writeMarkdown": true
+  }
+}

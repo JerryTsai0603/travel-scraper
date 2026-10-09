@@ -1,0 +1,78 @@
+<% const sortMode = (filter && filter.sort) || 'published-desc'; %>
+<% const qfMode = (filter && filter.qf) || 'all'; %>
+<form class="filters" method="get" action="/">
+  <div class="filter-bar">
+    <div class="quick-filter">
+      <span class="filter-label">快速</span>
+      <% [
+        { v: 'all',      label: '全部' },
+        { v: 'today',    label: '今日新片' },
+        { v: 'week',     label: '本週新片' },
+        { v: 'favorite', label: '已收藏' },
+        { v: 'watched',  label: '已看過' },
+        { v: 'unwatched', label: '未看過' }
+      ].forEach(function(o) { %>
+        <a class="qf-chip <%= qfMode === o.v ? 'on' : '' %>" href="?<%= new URLSearchParams(Object.assign({}, filter||{}, { qf: o.v, sort: sortMode })).toString() %>"><%= o.label %></a>
+      <% }) %>
+    </div>
+    <div class="sort-block">
+      <span class="filter-label">排序</span>
+      <select name="sort" id="sortSelect">
+        <option value="published-desc" <%= sortMode==='published-desc'?'selected':'' %>>發片時間（新→舊）</option>
+        <option value="published-asc"  <%= sortMode==='published-asc' ?'selected':'' %>>發片時間（舊→新）</option>
+        <option value="captured-desc"  <%= sortMode==='captured-desc' ?'selected':'' %>>收錄時間（新→舊）</option>
+        <option value="captured-asc"   <%= sortMode==='captured-asc'  ?'selected':'' %>>收錄時間（舊→新）</option>
+        <option value="duration-desc"  <%= sortMode==='duration-desc' ?'selected':'' %>>時長（長→短）</option>
+        <option value="duration-asc"   <%= sortMode==='duration-asc'  ?'selected':'' %>>時長（短→長）</option>
+        <option value="title-asc"      <%= sortMode==='title-asc'     ?'selected':'' %>>標題 A→Z</option>
+        <option value="title-desc"     <%= sortMode==='title-desc'    ?'selected':'' %>>標題 Z→A</option>
+      </select>
+    </div>
+  </div>
+  <div class="filter-row">
+    <label class="filter">
+      <span>關鍵字</span>
+      <input type="text" name="q" value="<%= filter.q || '' %>" placeholder="標題 / 演員 / 標籤">
+    </label>
+    <label class="filter">
+      <span>站點</span>
+      <select name="site">
+        <option value="">全部</option>
+        <option value="jable"  <%= filter.site==='jable' ?'selected':'' %>>Jable</option>
+        <option value="missav" <%= filter.site==='missav'?'selected':'' %>>missav</option>
+      </select>
+    </label>
+    <label class="filter">
+      <span>從</span>
+      <input type="date" name="from" value="<%= filter.from || '' %>">
+    </label>
+    <label class="filter">
+      <span>至</span>
+      <input type="date" name="to" value="<%= filter.to || '' %>">
+    </label>
+    <label class="filter">
+      <span>演員</span>
+      <input type="text" name="performer" value="<%= filter.performer || '' %>" placeholder="部分名稱">
+    </label>
+    <label class="filter">
+      <span>標籤</span>
+      <input type="text" name="tag" value="<%= filter.tag || '' %>" placeholder="完全相符">
+    </label>
+    <input type="hidden" name="qf" value="<%= qfMode %>">
+    <div class="filter-actions">
+      <button type="submit">套用</button>
+      <a class="reset" href="/">清除</a>
+    </div>
+  </div>
+</form>
+<script>
+  // Auto-submit when sort changes; preserve other query params
+  (function() {
+    var sel = document.getElementById('sortSelect');
+    if (!sel) return;
+    sel.addEventListener('change', function() {
+      var form = sel.closest('form');
+      if (form) form.submit();
+    });
+  })();
+</script>
