@@ -133,6 +133,21 @@
         <option value="off"            <%= t.alertMode === 'off'            ? 'selected' : '' %>>關閉通知</option>
       </select>
     </label>
+    <label class="filter">
+      <span>抓取頻率</span>
+      <select name="fetchIntervalMinutes">
+        <% const fiv = t.fetchIntervalMinutes; %>
+        <option value=""      <%= fiv == null ? 'selected' : '' %>>使用全域預設（<%= process.env.PRICES_DEFAULT_INTERVAL || 360 %> 分）</option>
+        <option value="5"     <%= fiv === 5     ? 'selected' : '' %>>每 5 分鐘（最即時）</option>
+        <option value="15"    <%= fiv === 15    ? 'selected' : '' %>>每 15 分鐘</option>
+        <option value="30"    <%= fiv === 30    ? 'selected' : '' %>>每 30 分鐘</option>
+        <option value="60"    <%= fiv === 60    ? 'selected' : '' %>>每 1 小時</option>
+        <option value="180"   <%= fiv === 180   ? 'selected' : '' %>>每 3 小時</option>
+        <option value="360"   <%= fiv === 360   ? 'selected' : '' %>>每 6 小時</option>
+        <option value="720"   <%= fiv === 720   ? 'selected' : '' %>>每 12 小時</option>
+        <option value="1440"  <%= fiv === 1440  ? 'selected' : '' %>>每 24 小時</option>
+      </select>
+    </label>
     <label class="filter grow">
       <span>備註</span>
       <input type="text" name="notes" value="<%= t.notes || '' %>" maxlength="600"/>

@@ -139,6 +139,9 @@ function normalizeTrip(input) {
   trip.alertMode = ['below-average', 'threshold', 'both', 'off'].includes(trip.alertMode)
     ? trip.alertMode
     : 'below-average';
+  // per-trip fetch interval（分鐘）。未設 = 跟全域 PRICES_DEFAULT_INTERVAL
+  const fiv = parseInt(trip.fetchIntervalMinutes, 10);
+  trip.fetchIntervalMinutes = Number.isFinite(fiv) && fiv > 0 ? Math.min(24 * 60, Math.max(1, fiv)) : null;
   if (trip.kind === 'flight') {
     trip.origin = String(trip.origin || '').toUpperCase().slice(0, 8);
     trip.destination = String(trip.destination || '').toUpperCase().slice(0, 8);
@@ -215,7 +218,19 @@ export function summarizeTrip(trip) {
     lastFetchedAt: lastFetched,
     cheapestSnapshot: cheapest,
     daysToDepart: daysUntil(trip.kind === 'flight' ? trip.departDate : trip.hotelCheckIn),
+    nextFetchAt: computeNextFetchAt(trip, lastFetched),
   };
+}
+
+// 下次抓取時間：用 trip 自己的 interval，否則 fallback 到全域預設
+export function computeNextFetchAt(trip, lastFetchedAt) {
+  if (!trip) return null;
+  const envDefault = parseInt(process.env.PRICES_DEFAULT_INTERVAL || '360', 10); // 預設 6 小時
+  const minutes = Number.isFinite(trip.fetchIntervalMinutes) && trip.fetchIntervalMinutes > 0
+    ? trip.fetchIntervalMinutes
+    : envDefault;
+  const baseMs = lastFetchedAt ? new Date(lastFetchedAt).getTime() : Date.now();
+  return new Date(baseMs + minutes * 60_000).toISOString();
 }
 
 export function pickCheapest(history) {

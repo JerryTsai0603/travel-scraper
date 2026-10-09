@@ -25,6 +25,8 @@ services:
         value: 20.11.0
       - key: PRICES_SCHEDULER
         value: "true"          # 雲端也跑排程（必要時改 false）
+      - key: PRICES_DEFAULT_INTERVAL
+        value: "15"            # 全域預設抓取間隔（分鐘），per-trip 可覆蓋
       - key: AUTO_PORT
         value: "false"         # Render 會注入 PORT，直接 listen 該 port
       # ↓ 把你的 secrets 加到 Render Dashboard，不要寫在這裡

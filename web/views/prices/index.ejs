@@ -55,6 +55,11 @@
             <% } %>
               <li>📊 歷史 <%= s.historyCount %> 筆</li>
               <li>⏱ 上次抓取 <%= s.lastFetchedAt ? new Date(s.lastFetchedAt).toLocaleString('zh-Hant') : '尚未抓取' %></li>
+              <li>⏰ 頻率：<%= trip.fetchIntervalMinutes ? `每 ${trip.fetchIntervalMinutes} 分` : '使用全域預設' %></li>
+              <% if (s.nextFetchAt) { %>
+                <% const ms = new Date(s.nextFetchAt).getTime() - Date.now(); %>
+                <li>📡 下次：<%= ms <= 0 ? '即將執行' : `${Math.max(0, Math.round(ms / 60000))} 分後` %></li>
+              <% } %>
             </ul>
 
             <div class="trip-price">

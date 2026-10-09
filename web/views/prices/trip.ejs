@@ -81,6 +81,16 @@
     <% if (threshold) { %>
       　🎯 門檻 <%= trip.currency %> <%= Math.round(threshold).toLocaleString('zh-Hant') %>
     <% } %>
+    <% if (trip.fetchIntervalMinutes) { %>
+      　⏰ 每 <%= trip.fetchIntervalMinutes %> 分抓一次
+    <% } %>
+    <% if (summary.nextFetchAt) { %>
+      <%
+        const ms = new Date(summary.nextFetchAt).getTime() - Date.now();
+        const dueSoon = ms <= 0;
+      %>
+      　📡 下次抓取：<%= dueSoon ? '即將執行' : new Date(summary.nextFetchAt).toLocaleString('zh-Hant') + `（約 ${Math.max(0, Math.round(ms / 60000))} 分後）` %>
+    <% } %>
   </p>
   <p>
     <% if (flightLinks) { %>
