@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>價格監控 · Travel Scraper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="index.html">✈️🏨 Travel Scraper</a>
+      <nav class="nav">
+        <a href="index.html">首頁</a>
+        <a href="prices.html" style="color:#fff">💸 價格監控</a>
+        <a href="https://github.com/JerryTsai0603/travel-scraper" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>💸 價格監控</h1>
+      <p class="hero-sub">追蹤 2 個行程 ｜ 資料來源：Mock (離線示範) <span class="muted">— 純前端 demo，資料為示意</span></p>
+    </section>
+
+    <section class="trip-grid">
+      <article class="trip-card kind-flight">
+        <div class="trip-head">
+          <span class="kind-badge flight">✈️ 機票</span>
+          <h3><a href="trip-flight.html">TPE → NRT 11 月滑雪</a></h3>
+        </div>
+        <div class="trip-body">
+          <ul class="trip-meta">
+            <li>TPE → NRT</li>
+            <li>2026-11-23 → 2026-11-28</li>
+            <li>economy × 2</li>
+            <li>📊 歷史 4 筆</li>
+            <li>⏱ 上次抓取 2026/10/09 23:00</li>
+          </ul>
+          <div class="trip-price">
+            <div class="price-now">
+              <span class="cur">TWD</span>
+              <span class="num">16,680</span>
+            </div>
+          </div>
+          <div class="threshold">門檻 TWD 30,000</div>
+          <div class="countdown">⏳ 還有 45 天出發</div>
+        </div>
+        <div class="trip-foot">
+          <a class="btn small" href="trip-flight.html">查看 →</a>
+        </div>
+      </article>
+
+      <article class="trip-card kind-hotel">
+        <div class="trip-head">
+          <span class="kind-badge hotel">🏨 住宿</span>
+          <h3><a href="trip-hotel.html">澀谷周邊飯店 12 月</a></h3>
+        </div>
+        <div class="trip-body">
+          <ul class="trip-meta">
+            <li>🏙 Tokyo (澀谷中心)</li>
+            <li>📅 2026-12-10 → 2026-12-13</li>
+            <li>🛏 standard × 2</li>
+            <li>📊 歷史 3 筆</li>
+            <li>⏱ 上次抓取 2026/10/09 22:50</li>
+          </ul>
+          <div class="trip-price">
+            <div class="price-now alert">
+              <span class="cur">TWD</span>
+              <span class="num">7,188</span>
+              <span class="badge alert">低於門檻</span>
+            </div>
+          </div>
+          <div class="threshold">門檻 TWD 30,000</div>
+          <div class="countdown">⏳ 還有 62 天出發</div>
+        </div>
+        <div class="trip-foot">
+          <a class="btn small" href="trip-hotel.html">查看 →</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>ℹ️ 關於這個 demo</h2>
+      <p>這是 GitHub Pages 的靜態 demo 頁。完整功能（新增 / 編輯 / 自動抓取 / 警報）需要把程式碼 clone 到本機跑：</p>
+      <pre style="background:var(--bg-3);padding:12px;border-radius:8px;font-size:12px;overflow:auto">
+git clone https://github.com/JerryTsai0603/travel-scraper.git
+cd travel-scraper
+scripts\start-prices.cmd   # Windows
+# 或 deploy 到 Railway: scripts\deploy-railway.cmd</pre>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <small>純前端 demo</small>
+    </div>
+  </footer>
+</body>
+</html>

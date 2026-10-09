@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>澀谷周邊飯店 12 月 · Travel Scraper</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="index.html">✈️🏨 Travel Scraper</a>
+      <nav class="nav">
+        <a href="index.html">首頁</a>
+        <a href="prices.html">💸 價格監控</a>
+        <a href="https://github.com/JerryTsai0603/travel-scraper" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>
+        <span class="kind-badge hotel">🏨</span>
+        澀谷周邊飯店 12 月
+      </h1>
+      <p class="hero-sub">
+        🏨 Tokyo (澀谷中心) · 2026-12-10 → 2026-12-13 · standard × 2　
+        ⏳ 還有 62 天　
+        🎯 門檻 TWD 30,000
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>📈 價格趨勢</h2>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 720 240" class="price-chart" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(255, 184, 111, 0.45)"/>
+              <stop offset="100%" stop-color="rgba(255, 184, 111, 0.02)"/>
+            </linearGradient>
+          </defs>
+          <line x1="28" y1="212" x2="692" y2="212" stroke="#2a2f3d"/>
+          <line x1="28" y1="28"  x2="28"  y2="212" stroke="#2a2f3d"/>
+          <g font-size="10" fill="#9aa1b1" text-anchor="end">
+            <line x1="28" y1="40"  x2="692" y2="40"  stroke="#2a2f3d" stroke-dasharray="2 4" opacity="0.4"/>
+            <text x="22" y="44">30,000</text>
+            <line x1="28" y1="97"  x2="692" y2="97"  stroke="#2a2f3d" stroke-dasharray="2 4" opacity="0.4"/>
+            <text x="22" y="101">22,000</text>
+            <line x1="28" y1="155" x2="692" y2="155" stroke="#2a2f3d" stroke-dasharray="2 4" opacity="0.4"/>
+            <text x="22" y="159">14,000</text>
+            <line x1="28" y1="212" x2="692" y2="212" stroke="#2a2f3d" stroke-dasharray="2 4" opacity="0.4"/>
+            <text x="22" y="216">6,000</text>
+          </g>
+          <line x1="28" y1="40" x2="692" y2="40" stroke="#ffb86f" stroke-dasharray="4 4" stroke-width="1.5"/>
+          <text x="688" y="36" text-anchor="end" font-size="10" fill="#ffb86f">門檻 30,000</text>
+          <polygon fill="url(#areaFill)" points="60,80 280,90 500,160 660,188 660,212 60,212"/>
+          <polyline fill="none" stroke="#ff6f91" stroke-width="2" points="60,80 280,90 500,160 660,188"/>
+          <g>
+            <circle cx="60"  cy="80"  r="4" fill="#ff6f91" stroke="#0f1115" stroke-width="1.5"/>
+            <text x="60"  y="70"  font-size="11" fill="#e6e8ee" text-anchor="middle">24,800</text>
+            <circle cx="280" cy="90"  r="4" fill="#ff6f91" stroke="#0f1115" stroke-width="1.5"/>
+            <text x="280" y="80"  font-size="11" fill="#e6e8ee" text-anchor="middle">23,500</text>
+            <circle cx="500" cy="160" r="4" fill="#ff6f91" stroke="#0f1115" stroke-width="1.5"/>
+            <text x="500" y="150" font-size="11" fill="#e6e8ee" text-anchor="middle">14,200</text>
+            <circle cx="660" cy="188" r="4" fill="#ff6f91" stroke="#0f1115" stroke-width="1.5"/>
+            <text x="660" y="178" font-size="11" fill="#ff6f8a" text-anchor="middle">7,188</text>
+          </g>
+          <g font-size="10" fill="#9aa1b1" text-anchor="middle">
+            <text x="60"  y="232">10/03</text>
+            <text x="280" y="232">10/05</text>
+            <text x="500" y="232">10/07</text>
+            <text x="660" y="232">10/09</text>
+          </g>
+        </svg>
+        <div class="chart-axis">
+          <span>2026-10-03</span>
+          <span>2026-10-09</span>
+        </div>
+      </div>
+
+      <div class="price-stats">
+        <div class="stat-card">
+          <div class="stat-num" style="color:#ffb86f">7,188</div>
+          <div class="stat-label">目前最低 (TWD)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">7,188</div>
+          <div class="stat-label">歷史最低 (TWD)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">3</div>
+          <div class="stat-label">抓取筆數</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">🚨 是</div>
+          <div class="stat-label">觸發門檻</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>🗺 周邊飯店分佈</h2>
+      <div id="hotelMap" class="map-canvas"></div>
+      <p class="map-legend">中心 (35.6595, 139.7005) ｜半徑 4 km ｜共 5 筆，5 筆在半徑內</p>
+
+      <table class="results-table" style="margin-top:14px">
+        <thead><tr><th>飯店</th><th>星等</th><th class="num">評分</th><th class="num">評論數</th><th class="num">距離</th><th class="num">每晚</th><th class="num">總價</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>成田日航<br><small class="muted">Tokyo 中心 1.42 km</small></td>
+            <td>★★★★</td>
+            <td class="num">4.6</td>
+            <td class="num">3,210</td>
+            <td class="num">1.42 km</td>
+            <td class="num">TWD 2,396</td>
+            <td class="num">TWD 7,188</td>
+          </tr>
+          <tr>
+            <td>東京灣希爾頓<br><small class="muted">Tokyo 中心 1.46 km</small></td>
+            <td>★★★★★</td>
+            <td class="num">4.7</td>
+            <td class="num">4,512</td>
+            <td class="num">1.46 km</td>
+            <td class="num">TWD 2,819</td>
+            <td class="num">TWD 8,457</td>
+          </tr>
+          <tr>
+            <td>難波光芒飯店<br><small class="muted">Tokyo 中心 1.52 km</small></td>
+            <td>★★★★</td>
+            <td class="num">4.3</td>
+            <td class="num">2,108</td>
+            <td class="num">1.52 km</td>
+            <td class="num">TWD 2,960</td>
+            <td class="num">TWD 8,880</td>
+          </tr>
+          <tr>
+            <td>新宿王子大飯店<br><small class="muted">Tokyo 中心 1.74 km</small></td>
+            <td>★★★★</td>
+            <td class="num">4.2</td>
+            <td class="num">1,856</td>
+            <td class="num">1.74 km</td>
+            <td class="num">TWD 2,593</td>
+            <td class="num">TWD 7,779</td>
+          </tr>
+          <tr>
+            <td>上野不忍可可大飯店<br><small class="muted">Tokyo 中心 2.35 km</small></td>
+            <td>★★★</td>
+            <td class="num">4.0</td>
+            <td class="num">1,204</td>
+            <td class="num">2.35 km</td>
+            <td class="num">TWD 3,157</td>
+            <td class="num">TWD 9,471</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>📜 抓取記錄</h2>
+      <table class="results-table">
+        <thead><tr><th>時間</th><th>來源</th><th>類型</th><th class="num">最低價</th></tr></thead>
+        <tbody>
+          <tr><td>2026-10-09 22:50:14</td><td>mock</td><td>hotel</td><td class="num">TWD 7,188</td></tr>
+          <tr><td>2026-10-07 22:50:18</td><td>mock</td><td>hotel</td><td class="num">TWD 14,200</td></tr>
+          <tr><td>2026-10-05 22:50:12</td><td>mock</td><td>hotel</td><td class="num">TWD 23,500</td></tr>
+          <tr><td>2026-10-03 22:50:16</td><td>mock</td><td>hotel</td><td class="num">TWD 24,800</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <small>純前端 demo · 資料為示意</small>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    (function () {
+      var center = { lat: 35.6595, lng: 139.7005 };
+      var radiusKm = 4;
+      var map = L.map('hotelMap', { scrollWheelZoom: false }).setView([center.lat, center.lng], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '© OpenStreetMap'
+      }).addTo(map);
+
+      L.circle([center.lat, center.lng], {
+        radius: radiusKm * 1000,
+        color: '#ff6f91', weight: 2, fillColor: '#ff6f91', fillOpacity: 0.10
+      }).addTo(map);
+      L.marker([center.lat, center.lng], {
+        icon: L.divIcon({ className: 'center-pin', html: '📍', iconSize: [24, 24], iconAnchor: [12, 12] })
+      }).addTo(map).bindPopup('<b>搜尋中心</b><br>35.6595, 139.7005<br>半徑 4 km');
+
+      var hotels = [
+        { name: '成田日航',          lat: 35.6710, lng: 139.7040, price: 7188 },
+        { name: '東京灣希爾頓',      lat: 35.6520, lng: 139.6895, price: 8457 },
+        { name: '難波光芒飯店',      lat: 35.6500, lng: 139.7150, price: 8880 },
+        { name: '新宿王子大飯店',    lat: 35.6710, lng: 139.7150, price: 7779 },
+        { name: '上野不忍可可大飯店', lat: 35.6720, lng: 139.7250, price: 9471 }
+      ];
+      hotels.forEach(function (h) {
+        var icon = L.divIcon({
+          className: 'hotel-pin',
+          html: '<div class="hotel-pin-price">' + h.price.toLocaleString('zh-Hant') + '</div>',
+          iconSize: [56, 22], iconAnchor: [28, 11]
+        });
+        L.marker([h.lat, h.lng], { icon: icon }).addTo(map).bindPopup(
+          '<b>' + h.name + '</b><br>TWD ' + h.price.toLocaleString('zh-Hant')
+        );
+      });
+
+      var bounds = L.latLngBounds([[center.lat, center.lng]].concat(hotels.map(function (h) { return [h.lat, h.lng]; })));
+      map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+    })();
+  </script>
+</body>
+</html>

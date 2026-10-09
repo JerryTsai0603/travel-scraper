@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Scraper · 機票/住宿即時監控</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="index.html">✈️🏨 Travel Scraper</a>
+      <nav class="nav">
+        <a href="index.html">首頁</a>
+        <a href="prices.html">💸 價格監控</a>
+        <a href="https://github.com/JerryTsai0603/travel-scraper" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>即時監控機票與住宿價格</h1>
+      <p class="hero-sub">Daily scraper + 價格趨勢 + 門檻警報 + 雲端排程 — 一站搞定</p>
+    </section>
+
+    <section class="features">
+      <div class="feature">
+        <h3>✈️ 機票追蹤</h3>
+        <p>出發/目的地/艙等/日期 — 自動抓取多家來源，趨勢一目了然。</p>
+      </div>
+      <div class="feature">
+        <h3>🏨 飯店 + 地圖</h3>
+        <p>內建 Leaflet 地圖，點地圖 / 拖 marker 框選範圍 + 半徑。</p>
+      </div>
+      <div class="feature">
+        <h3>📈 趨勢圖</h3>
+        <p>內嵌 SVG 面積圖 + 折線 + 門檻線，無需第三方圖表庫。</p>
+      </div>
+      <div class="feature">
+        <h3>🔔 門檻警報</h3>
+        <p>價格低於門檻自動推播 Telegram / Discord。</p>
+      </div>
+      <div class="feature">
+        <h3>⏰ 雲端排程</h3>
+        <p>每 6 小時自動抓；排程在 Node.js 內跑，部署到 Railway / Render 都吃。</p>
+      </div>
+      <div class="feature">
+        <h3>💾 完整 CRUD</h3>
+        <p>多 trip 管理、CSV 匯出、JSON API，介面乾淨簡潔。</p>
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>👀 看 Demo</h2>
+      <p>下面是 mock 範例資料（內建 mock provider 自動生成）</p>
+      <p>
+        <a class="btn primary" href="prices.html">💸 進入價格監控</a>
+        <a class="btn" href="trip-flight.html">✈️ 機票 trip demo</a>
+        <a class="btn" href="trip-hotel.html">🏨 飯店 trip demo</a>
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>📦 原始碼</h2>
+      <p>完整 Express + EJS 應用，<a href="https://github.com/JerryTsai0603/travel-scraper" target="_blank" rel="noopener">JerryTsai0603/travel-scraper</a>。</p>
+      <p class="muted">這個 GitHub Pages 只展示靜態 demo。要真的「持續抓取 + 警報 + 雲端排程」請 clone 跑：<br>
+        <code>git clone https://github.com/JerryTsai0603/travel-scraper.git</code><br>
+        <code>cd travel-scraper</code><br>
+        <code>scripts\start-prices.cmd</code> （Windows）<br>
+        或 deploy 到 Railway / Render / Fly.io（<code>render.yaml</code> 已備好）</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <small>純前端 demo · 公開資料來源：Jable.tv / missav123.com / 機票住宿公開頁面</small>
+    </div>
+  </footer>
+</body>
+</html>

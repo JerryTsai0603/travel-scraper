@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TPE → NRT 11 月滑雪 · Travel Scraper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="index.html">✈️🏨 Travel Scraper</a>
+      <nav class="nav">
+        <a href="index.html">首頁</a>
+        <a href="prices.html">💸 價格監控</a>
+        <a href="https://github.com/JerryTsai0603/travel-scraper" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>
+        <span class="kind-badge flight">✈️</span>
+        TPE → NRT 11 月滑雪
+      </h1>
+      <p class="hero-sub">
+        ✈️ TPE → NRT · 2026-11-23 → 2026-11-28 · economy × 2　
+        ⏳ 還有 45 天　
+        🎯 門檻 TWD 30,000
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>📈 價格趨勢</h2>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 720 240" class="price-chart" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(255, 111, 145, 0.45)"/>
+              <stop offset="100%" stop-color="rgba(255, 111, 145, 0.02)"/>
+            </linearGradient>
+          </defs>
+          <!-- 軸 -->
+          <line x1="28" y1="212" x2="692" y2="212" stroke="#2a2f3d"/>
+          <line x1="28" y1="28"  x2="28"  y2="212" stroke="#2a2f3d"/>
+          <!-- 網格 + y 軸標籤 -->
+          <g font-size="10" fill="#9aa1b1" text-anchor="end">
+            <line x1="28" y1="40"  x2="692" y2="40"  stroke="#2a2f3d" stroke-dasharray="2 4" opacity="0.4"/>
+            <text x="22" y="44">25,000</text>
+            <line x1="28" y1="97"  x2="692" y2="97"  stroke="#2a2f3d" stroke-dasharray="2 4" opacity="0.4"/>
+            <text x="22" y="101">20,000</text>
+            <line x1="28" y1="155" x2="692" y2="155" stroke="#2a2f3d" stroke-dasharray="2 4" opacity="0.4"/>
+            <text x="22" y="159">15,000</text>
+            <line x1="28" y1="212" x2="692" y2="212" stroke="#2a2f3d" stroke-dasharray="2 4" opacity="0.4"/>
+            <text x="22" y="216">10,000</text>
+          </g>
+          <!-- 門檻線 -->
+          <line x1="28" y1="48" x2="692" y2="48" stroke="#ffb86f" stroke-dasharray="4 4" stroke-width="1.5"/>
+          <text x="688" y="44" text-anchor="end" font-size="10" fill="#ffb86f">門檻 30,000</text>
+          <!-- 趨勢 -->
+          <polygon fill="url(#areaFill)" points="60,180 220,140 380,160 540,100 660,118 660,212 60,212"/>
+          <polyline fill="none" stroke="#ff6f91" stroke-width="2" points="60,180 220,140 380,160 540,100 660,118"/>
+          <!-- 點 + 數值 -->
+          <g>
+            <circle cx="60"  cy="180" r="4" fill="#ff6f91" stroke="#0f1115" stroke-width="1.5"/>
+            <text x="60"  y="170" font-size="11" fill="#e6e8ee" text-anchor="middle">16,200</text>
+            <circle cx="220" cy="140" r="4" fill="#ff6f91" stroke="#0f1115" stroke-width="1.5"/>
+            <text x="220" y="130" font-size="11" fill="#e6e8ee" text-anchor="middle">20,500</text>
+            <circle cx="380" cy="160" r="4" fill="#ff6f91" stroke="#0f1115" stroke-width="1.5"/>
+            <text x="380" y="150" font-size="11" fill="#e6e8ee" text-anchor="middle">18,800</text>
+            <circle cx="540" cy="100" r="4" fill="#ff6f91" stroke="#0f1115" stroke-width="1.5"/>
+            <text x="540" y="90"  font-size="11" fill="#e6e8ee" text-anchor="middle">24,300</text>
+            <circle cx="660" cy="118" r="4" fill="#ff6f91" stroke="#0f1115" stroke-width="1.5"/>
+            <text x="660" y="108" font-size="11" fill="#e6e8ee" text-anchor="middle">22,400</text>
+          </g>
+          <!-- x 軸標籤 -->
+          <g font-size="10" fill="#9aa1b1" text-anchor="middle">
+            <text x="60"  y="232">10/05</text>
+            <text x="220" y="232">10/06</text>
+            <text x="380" y="232">10/07</text>
+            <text x="540" y="232">10/08</text>
+            <text x="660" y="232">10/09</text>
+          </g>
+        </svg>
+        <div class="chart-axis">
+          <span>2026-10-05</span>
+          <span>2026-10-09</span>
+        </div>
+      </div>
+
+      <div class="price-stats">
+        <div class="stat-card">
+          <div class="stat-num">16,680</div>
+          <div class="stat-label">目前最低 (TWD)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">16,200</div>
+          <div class="stat-label">歷史最低 (TWD)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">4</div>
+          <div class="stat-label">抓取筆數</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">—</div>
+          <div class="stat-label">觸發門檻</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>✈️ 最近航班</h2>
+      <table class="results-table">
+        <thead><tr><th>航空公司</th><th>航班</th><th>出發</th><th>抵達</th><th class="num">時長</th><th class="num">停留</th><th class="num">價格</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>BR · 長榮</td>
+            <td>BR818</td>
+            <td>11/23 09:10</td>
+            <td>11/23 13:30</td>
+            <td class="num">260 分</td>
+            <td class="num">直飛</td>
+            <td class="num">TWD 16,680</td>
+          </tr>
+          <tr>
+            <td>CI · 華航</td>
+            <td>CI100</td>
+            <td>11/23 10:40</td>
+            <td>11/23 15:00</td>
+            <td class="num">260 分</td>
+            <td class="num">直飛</td>
+            <td class="num">TWD 19,680</td>
+          </tr>
+          <tr>
+            <td>JL · JAL</td>
+            <td>JL804</td>
+            <td>11/23 13:25</td>
+            <td>11/23 19:10</td>
+            <td class="num">345 分</td>
+            <td class="num">1 轉</td>
+            <td class="num">TWD 18,200</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>📜 抓取記錄</h2>
+      <table class="results-table">
+        <thead><tr><th>時間</th><th>來源</th><th>類型</th><th class="num">最低價</th></tr></thead>
+        <tbody>
+          <tr><td>2026-10-09 23:00:12</td><td>mock</td><td>flight</td><td class="num">TWD 16,680</td></tr>
+          <tr><td>2026-10-08 23:00:09</td><td>mock</td><td>flight</td><td class="num">TWD 24,300</td></tr>
+          <tr><td>2026-10-07 23:00:14</td><td>mock</td><td>flight</td><td class="num">TWD 18,800</td></tr>
+          <tr><td>2026-10-06 23:00:11</td><td>mock</td><td>flight</td><td class="num">TWD 20,500</td></tr>
+          <tr><td>2026-10-05 23:00:13</td><td>mock</td><td>flight</td><td class="num">TWD 16,200</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <small>純前端 demo · 資料為示意</small>
+    </div>
+  </footer>
+</body>
+</html>
