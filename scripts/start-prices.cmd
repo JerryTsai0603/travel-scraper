@@ -44,6 +44,8 @@ if "%PORT%"=="" set "PORT=3000"
 if "%HOST%"=="" set "HOST=127.0.0.1"
 if "%PRICES_SCHEDULER%"=="" set "PRICES_SCHEDULER=true"
 if "%AUTO_PORT%"=="" set "AUTO_PORT=true"
+echo.
+echo Env: HOST=%HOST% PORT=%PORT% PRICES_SCHEDULER=%PRICES_SCHEDULER% AUTO_PORT=%AUTO_PORT%
 
 echo.
 echo Starting: http://%HOST%:%PORT%/prices

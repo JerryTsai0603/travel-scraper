@@ -21,7 +21,9 @@ const PRICES_SCHEDULER_IMPORT = process.env.PRICES_SCHEDULER_IMPORT; // 可注�
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REQUESTED_PORT = parseInt(process.env.PORT || '3000', 10);
-const HOST = process.env.HOST || '127.0.0.1';
+// 雲端環境自動 bind 0.0.0.0；本機預設 127.0.0.1（不影響開發）
+const IS_CLOUD = !!(process.env.RAILWAY_ENVIRONMENT || process.env.RENDER || process.env.FLY_APP_NAME || process.env.PORT);
+const HOST = process.env.HOST || (IS_CLOUD ? '0.0.0.0' : '127.0.0.1');
 const AUTO_PORT = (process.env.AUTO_PORT ?? 'true').toLowerCase() !== 'false';
 const MAX_PORT_TRIES = 20;
 
